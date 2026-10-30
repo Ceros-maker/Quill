@@ -1,0 +1,21 @@
+<h1>New Chapter</h1>
+<p class="meta">for <a href="/stories/<%= story.id %>"><%= story.title %></a></p>
+
+<div class="card">
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <form method="POST" action="/stories/<%= story.id %>/chapters">
+    <label>Chapter Title</label>
+    <input type="text" name="title" required autofocus />
+
+    <label>Content</label>
+    <textarea name="content" rows="12" required></textarea>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Publish Chapter</button>
+      <a href="/stories/<%= story.id %>" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,55 @@
+<% 
+  function formatDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('en-US', { 
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+%>
+
+<h1>Chapter <%= chapter.chapter_number %>: <%= chapter.title %></h1>
+<p class="meta">
+  from <a href="/stories/<%= story.id %>"><%= story.title %></a> by <%= story.author_username %>
+</p>
+
+<div class="card">
+  <div style="white-space: pre-wrap;"><%= chapter.content %></div>
+</div>
+
+<div class="form-actions">
+  <a href="/stories/<%= story.id %>" class="btn btn-secondary">Back to story</a>
+  <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+    <a href="/stories/<%= story.id %>/chapters/<%= chapter.id %>/edit" class="btn">Edit</a>
+    <form method="POST" action="/stories/<%= story.id %>/chapters/<%= chapter.id %>/delete" style="display: inline;">
+      <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this chapter?');">Delete</button>
+    </form>
+  <% } %>
+</div>
+
+<h2 style="margin-top: 32px;">Comments</h2>
+
+<% if (comments.length === 0) { %>
+  <p><em>No comments yet.</em></p>
+<% } else { %>
+  <div class="comments">
+    <% for (const comment of comments) { %>
+      <div class="comment" style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+        <p><strong><%= comment.username %></strong> <span class="meta">· <%= comment.created_at.toLocaleString() %></span></p>
+        <p><%= comment.body %></p>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (typeof user !== 'undefined' && user) { %>
+  <form method="POST" action="/stories/<%= story.id %>/chapters/<%= chapter.id %>/comments" style="margin-top: 20px;">
+    <label>Leave a comment</label>
+    <textarea name="body" rows="3" required></textarea>
+    <div class="form-actions">
+      <button type="submit" class="btn">Post Comment</button>
+    </div>
+  </form>
+<% } else { %>
+  <p style="margin-top: 20px;"><a href="/login">Log in</a> to leave a comment.</p>
+<% } %>

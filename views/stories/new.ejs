@@ -1,0 +1,30 @@
+<h1>New Story</h1>
+
+<div class="card">
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <form method="POST" action="/stories">
+  <label>Title</label>
+  <input type="text" name="title" required autofocus />
+
+  <label>Cover Image URL (optional)</label>
+<input type="url" name="cover_url" placeholder="https://example.com/cover.jpg" />
+
+  <label>Description</label>
+  <textarea name="description" rows="4"></textarea>
+
+  <div style="margin-top: 16px;">
+    <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+      <input type="checkbox" name="publish" checked style="width: auto;" />
+      Publish now (uncheck to save as draft)
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn">Create Story</button>
+    <a href="/stories" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+</div>

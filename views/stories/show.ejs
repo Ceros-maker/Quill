@@ -1,0 +1,151 @@
+<h1><%= story.title %></h1>
+<p class="meta">
+  by <a href="/users/<%= story.author_username %>"><%= story.author_username %></a>
+</p>
+
+<% if (!story.published_at && user && user.id === story.author_id) { %>
+  <div class="draft-banner">
+    <strong>This is a draft.</strong> Only you can see it.
+    <form method="POST" action="/stories/<%= story.id %>/publish" style="display: inline; margin-left: 12px;">
+      <button type="submit" class="btn">Publish Now</button>
+    </form>
+  </div>
+<% } %>
+
+<% if (story.cover_url) { %>
+  <img src="<%= story.cover_url %>" alt="" style="max-width: 100%; border-radius: 8px; margin-bottom: 16px;" />
+<% } %>
+
+<div class="card">
+  <% if (story.description) { %>
+    <p><%= story.description %></p>
+  <% } else { %>
+    <p><em>No description.</em></p>
+  <% } %>
+</div>
+
+<% if (typeof user !== 'undefined' && user && user.id !== story.author_id) { %>
+  <div class="form-actions" style="margin-bottom: 24px;">
+    <% if (isSaved) { %>
+      <form method="POST" action="/library/<%= story.id %>/remove" style="display: inline;">
+        <button type="submit" class="btn btn-secondary">Remove from Library</button>
+      </form>
+    <% } else { %>
+      <form method="POST" action="/library/<%= story.id %>" style="display: inline;">
+        <button type="submit" class="btn">Save to Library</button>
+      </form>
+    <% } %>
+  </div>
+<% } %>
+
+<h2>Chapters</h2>
+
+<% if (chapters.length === 0) { %>
+  <div class="empty">
+    <p>No chapters yet.</p>
+    <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+      <a href="/stories/<%= story.id %>/chapters/new" class="btn">+ Add the first chapter</a>
+    <% } %>
+  </div>
+<% } else { %>
+  <ul class="chapter-list">
+    <% for (const chapter of chapters) { %>
+      <li class="chapter-item">
+        <a href="/stories/<%= story.id %>/chapters/<%= chapter.id %>">
+          Chapter <%= chapter.chapter_number %>: <%= chapter.title %>
+        </a>
+      </li>
+    <% } %>
+  </ul>
+  <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+    <div class="form-actions" style="margin-top: 16px;">
+      <a href="/stories/<%= story.id %>/chapters/new" class="btn">+ Add chapter</a>
+    </div>
+  <% } %>
+<% } %>
+
+<div id="reviews">
+  <h2>Reviews</h2>
+
+  <% if (ratingStats.count > 0) { %>
+    <p class="rating-summary">
+      <strong><%= ratingStats.average %></strong> out of 5
+      · <%= ratingStats.count %> review<%= ratingStats.count === 1 ? '' : 's' %>
+    </p>
+  <% } %>
+
+  <% if (typeof user !== 'undefined' && user && user.id !== story.author_id) { %>
+    <% if (userReview) { %>
+      <div class="card">
+        <p class="meta">Your review</p>
+        <form method="POST" action="/stories/<%= story.id %>/reviews/edit">
+          <label>Rating</label>
+          <select name="rating" required>
+            <% for (let i = 1; i <= 5; i++) { %>
+              <option value="<%= i %>" <%= i === userReview.rating ? 'selected' : '' %>><%= i %> star<%= i === 1 ? '' : 's' %></option>
+            <% } %>
+          </select>
+
+          <label>Review</label>
+          <textarea name="body" rows="3"><%= userReview.body || '' %></textarea>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">Update Review</button>
+          </div>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="card">
+        <p class="meta">Write a review</p>
+        <form method="POST" action="/stories/<%= story.id %>/reviews">
+          <label>Rating</label>
+          <select name="rating" required>
+            <option value="">Choose...</option>
+            <option value="1">1 star</option>
+            <option value="2">2 stars</option>
+            <option value="3">3 stars</option>
+            <option value="4">4 stars</option>
+            <option value="5">5 stars</option>
+          </select>
+
+          <label>Review (optional)</label>
+          <textarea name="body" rows="3" placeholder="What did you think?"></textarea>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">Post Review</button>
+          </div>
+        </form>
+      </div>
+    <% } %>
+  <% } %>
+
+  <% if (reviews.length === 0) { %>
+    <p class="meta">No reviews yet.</p>
+  <% } else { %>
+    <% for (const review of reviews) { %>
+      <div class="review">
+        <p>
+          <strong><a href="/users/<%= review.username %>"><%= review.username %></a></strong>
+          · <%= review.rating %>/<%= 5 %>
+          · <%= new Date(review.created_at).toLocaleDateString() %>
+          <% if (review.updated_at !== review.created_at) { %>
+            <span class="meta">(edited)</span>
+          <% } %>
+        </p>
+        <% if (review.body) { %>
+          <p><%= review.body %></p>
+        <% } %>
+      </div>
+    <% } %>
+  <% } %>
+</div>
+
+<div class="form-actions" style="margin-top: 32px;">
+  <a href="/stories" class="btn btn-secondary">Back to stories</a>
+  <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+    <a href="/stories/<%= story.id %>/edit" class="btn">Edit Story</a>
+    <form method="POST" action="/stories/<%= story.id %>/delete" style="display: inline;">
+      <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this story?');">Delete Story</button>
+    </form>
+  <% } %>
+</div>

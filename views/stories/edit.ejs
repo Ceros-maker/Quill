@@ -1,0 +1,23 @@
+<h1>Edit Story</h1>
+
+<div class="card">
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <form method="POST" action="/stories/<%= story.id %>/edit">
+    <label>Title</label>
+    <input type="text" name="title" value="<%= story.title %>" required />
+
+    <label>Cover Image URL (optional)</label>
+    <input type="url" name="cover_url" value="<%= story.cover_url || '' %>" />
+
+    <label>Description</label>
+    <textarea name="description" rows="4"><%= story.description || '' %></textarea>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Save Changes</button>
+      <a href="/stories/<%= story.id %>" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>

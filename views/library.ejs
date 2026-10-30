@@ -1,0 +1,24 @@
+<div class="page-header">
+  <h1>My Library</h1>
+  <a href="/stories" class="btn btn-secondary">Browse stories</a>
+</div>
+
+<% if (stories.length === 0) { %>
+  <div class="empty">
+    <p>Your library is empty.</p>
+    <a href="/stories" class="btn">Find a story to save</a>
+  </div>
+<% } else { %>
+  <% for (const story of stories) { %>
+    <article class="story-card">
+      <% if (story.cover_url) { %>
+        <img src="<%= story.cover_url %>" alt="" style="max-width: 200px; border-radius: 8px; margin-bottom: 12px;" />
+      <% } %>
+      <h2><a href="/stories/<%= story.id %>"><%= story.title %></a></h2>
+      <p class="meta">by <%= story.author_username %></p>
+      <% if (story.description) { %>
+        <p><%= story.description %></p>
+      <% } %>
+    </article>
+  <% } %>
+<% } %>

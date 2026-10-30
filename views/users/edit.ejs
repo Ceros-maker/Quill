@@ -1,0 +1,16 @@
+<h1>Edit Profile</h1>
+
+<div class="card">
+  <form method="POST" action="/users/<%= profileUser.username %>/edit">
+    <label>Bio</label>
+    <textarea name="bio" rows="4" placeholder="Tell readers about yourself..."><%= profileUser.bio || '' %></textarea>
+
+    <label>Avatar Image URL</label>
+    <input type="url" name="avatar_url" value="<%= profileUser.avatar_url || '' %>" placeholder="https://..." />
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Save Changes</button>
+      <a href="/users/<%= profileUser.username %>" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>

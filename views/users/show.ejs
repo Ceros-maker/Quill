@@ -1,0 +1,71 @@
+<div class="profile-header">
+  <% if (profileUser.avatar_url) { %>
+    <img src="<%= profileUser.avatar_url %>" alt="" class="avatar" />
+  <% } else { %>
+    <div class="avatar avatar-placeholder"><%= profileUser.username.charAt(0).toUpperCase() %></div>
+  <% } %>
+
+  <div class="profile-info">
+    <h1><%= profileUser.username %></h1>
+    <% if (profileUser.bio) { %>
+      <p><%= profileUser.bio %></p>
+    <% } else { %>
+      <p class="meta">No bio yet.</p>
+    <% } %>
+
+    <% if (isSelf) { %>
+      <a href="/users/<%= profileUser.username %>/edit" class="btn btn-secondary">Edit Profile</a>
+    <% } %>
+  </div>
+</div>
+
+<h2>Stories (<%= publishedStories.length %>)</h2>
+
+<% if (publishedStories.length === 0) { %>
+  <p class="meta">No published stories yet.</p>
+<% } else { %>
+  <div class="story-grid">
+    <% for (const story of publishedStories) { %>
+      <a href="/stories/<%= story.id %>" class="story-tile">
+        <% if (story.cover_url) { %>
+          <img src="<%= story.cover_url %>" alt="" />
+        <% } else { %>
+          <div class="story-tile-placeholder"><%= story.title.charAt(0) %></div>
+        <% } %>
+        <span class="story-tile-title"><%= story.title %></span>
+      </a>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (isSelf && drafts.length > 0) { %>
+  <h2>Your Drafts (<%= drafts.length %>)</h2>
+  <div class="story-grid">
+    <% for (const story of drafts) { %>
+      <a href="/stories/<%= story.id %>" class="story-tile">
+        <% if (story.cover_url) { %>
+          <img src="<%= story.cover_url %>" alt="" />
+        <% } else { %>
+          <div class="story-tile-placeholder"><%= story.title.charAt(0) %></div>
+        <% } %>
+        <span class="story-tile-title"><%= story.title %></span>
+        <span class="badge-draft">Draft</span>
+      </a>
+    <% } %>
+  </div>
+<% } %>
+
+<% if (recentComments.length > 0) { %>
+  <h2>Recent Activity</h2>
+  <div class="activity-list">
+    <% for (const c of recentComments) { %>
+      <div class="activity-item">
+        <p><%= c.body %></p>
+        <p class="meta">
+          on <a href="/stories/<%= c.story_id %>/chapters/<%= c.chapter_id %>"><%= c.chapter_title %></a>
+          · <%= new Date(c.created_at).toLocaleDateString() %>
+        </p>
+      </div>
+    <% } %>
+  </div>
+<% } %>

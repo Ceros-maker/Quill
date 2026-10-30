@@ -1,0 +1,29 @@
+<h1>Dashboard</h1>
+
+<div class="card">
+  <p>Welcome, <strong><%= user.username %></strong>.</p>
+  <p>You're signed in as <%= user.email %>.</p>
+</div>
+
+<div class="page-header" style="margin-top: 32px;">
+  <h2>Your Stories</h2>
+  <a href="/stories/new" class="btn">+ New Story</a>
+</div>
+
+<% if (stories.length === 0) { %>
+  <div class="empty">
+    <p>You haven't written any stories yet.</p>
+    <a href="/stories/new" class="btn">Write your first one</a>
+  </div>
+<% } else { %>
+  <ul style="list-style: none; padding: 0;">
+    <% for (const story of stories) { %>
+      <li style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+        <a href="/stories/<%= story.id %>"><%= story.title %></a>
+        <% if (!story.published_at) { %>
+          <span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Draft</span>
+        <% } %>
+      </li>
+    <% } %>
+  </ul>
+<% } %>
