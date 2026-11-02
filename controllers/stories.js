@@ -50,7 +50,6 @@ exports.publish = async (req, res) => {
 exports.show = async (req, res) => {
   const story = await Story.findById(req.params.id);
   if (!story) return res.status(404).send('Story not found');
-
   if (!story.published_at) {
     if (!req.session.userId || story.author_id !== req.session.userId) {
       return res.status(404).send('Story not found');
@@ -58,24 +57,31 @@ exports.show = async (req, res) => {
   }
 
   const chapters = await Chapter.listByStory(story.id);
-  const isSaved = req.session.userId
-    ? await Library.isSaved(req.session.userId, story.id)
-    : false;
-
   const reviews = await Review.listByStory(story.id);
   const ratingStats = await Review.getAverage(story.id);
   const userReview = req.session.userId
     ? await Review.findByUserAndStory(req.session.userId, story.id)
     : null;
 
+  const canEdit = await Permissions.canEditStory(req.session.userId, story);
+  const canDelete = await Permissions.canDeleteStory(req.session.userId, story);
+  const canManageRoles = await Permissions.canManageRoles(req.session.userId, story);
+
+  // Also need to know: for each comment, can the current user delete it?
+  // That's per-comment, so the template will need the moderator flag.
+  const isModerator = await Permissions.canModerateComments(req.session.userId, story);
+
   res.render('stories/show', {
     title: story.title,
     story,
     chapters,
-    isSaved,
     reviews,
     ratingStats,
-    userReview
+    userReview,
+    canEdit,
+    canDelete,
+    canManageRoles,
+    isModerator
   });
 };
 

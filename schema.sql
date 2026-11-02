@@ -67,3 +67,12 @@ CREATE TABLE library (
   added_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (user_id, story_id)
 );
+
+CREATE TABLE story_roles (
+  id SERIAL PRIMARY KEY,
+  story_id INTEGER NOT NULL REFERENCES stories(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  role TEXT NOT NULL CHECK (role IN ('editor', 'moderator')),
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (story_id, user_id)
+);
