@@ -3,7 +3,7 @@
   by <a href="/users/<%= story.author_username %>"><%= story.author_username %></a>
 </p>
 
-<% if (!story.published_at && user && user.id === story.author_id) { %>
+<% if (!story.published_at && isAuthor) { %>
   <div class="draft-banner">
     <strong>This is a draft.</strong> Only you can see it.
     <form method="POST" action="/stories/<%= story.id %>/publish" style="display: inline; margin-left: 12px;">
@@ -24,7 +24,7 @@
   <% } %>
 </div>
 
-<% if (typeof user !== 'undefined' && user && user.id !== story.author_id) { %>
+<% if (!isAuthor && typeof user !== 'undefined' && user) { %>
   <div class="form-actions" style="margin-bottom: 24px;">
     <% if (isSaved) { %>
       <form method="POST" action="/library/<%= story.id %>/remove" style="display: inline;">
@@ -43,7 +43,7 @@
 <% if (chapters.length === 0) { %>
   <div class="empty">
     <p>No chapters yet.</p>
-    <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+    <% if (canEdit) { %>
       <a href="/stories/<%= story.id %>/chapters/new" class="btn">+ Add the first chapter</a>
     <% } %>
   </div>
@@ -57,7 +57,7 @@
       </li>
     <% } %>
   </ul>
-  <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+  <% if (canEdit) { %>
     <div class="form-actions" style="margin-top: 16px;">
       <a href="/stories/<%= story.id %>/chapters/new" class="btn">+ Add chapter</a>
     </div>
@@ -74,7 +74,7 @@
     </p>
   <% } %>
 
-  <% if (typeof user !== 'undefined' && user && user.id !== story.author_id) { %>
+  <% if (!isAuthor && typeof user !== 'undefined' && user) { %>
     <% if (userReview) { %>
       <div class="card">
         <p class="meta">Your review</p>
@@ -142,10 +142,15 @@
 
 <div class="form-actions" style="margin-top: 32px;">
   <a href="/stories" class="btn btn-secondary">Back to stories</a>
-  <% if (typeof user !== 'undefined' && user && user.id === story.author_id) { %>
+  <% if (canEdit) { %>
     <a href="/stories/<%= story.id %>/edit" class="btn">Edit Story</a>
+  <% } %>
+  <% if (canDelete) { %>
     <form method="POST" action="/stories/<%= story.id %>/delete" style="display: inline;">
       <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this story?');">Delete Story</button>
     </form>
+  <% } %>
+  <% if (canManageRoles) { %>
+    <a href="/stories/<%= story.id %>/roles" class="btn btn-secondary">Manage Roles</a>
   <% } %>
 </div>

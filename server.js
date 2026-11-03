@@ -62,6 +62,9 @@ app.use('/', userRoutes);
 const reviewRoutes = require('./routes/reviews');
 app.use('/', reviewRoutes);
 
+const storyRoleRoutes = require('./routes/storyRoles');
+app.use('/', storyRoleRoutes);
+
 app.get('/', (req, res) => {
   res.send('quill is running');
 });

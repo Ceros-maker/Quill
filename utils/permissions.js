@@ -1,4 +1,4 @@
-const StoryRole = rquire('../models/storyRole');
+const StoryRole = require('../models/storyRole');
 
 async function canEditStory(userId, story) {
     if (!userId) return false;
@@ -25,7 +25,7 @@ async function canDeleteChapter(userId, story) {
 async function canModerateComments(userId, story) {
     if (!userId) return false;
     if (story.author_id === userId) return true;
-    const role = await StoryRole.getRol(userId, story.id);
+    const role = await StoryRole.getRole(userId, story.id);
     return role === 'moderator';
 }
 

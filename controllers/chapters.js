@@ -1,25 +1,30 @@
 const Chapter = require('../models/chapter');
 const Story = require('../models/story');
 const Comment = require('../models/comment');
+const Permissions = require('../utils/permissions');
 
-// Show form for creating a chapter — story author only
 exports.newForm = async (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
 
   const story = await Story.findById(req.params.storyId);
   if (!story) return res.status(404).send('Story not found');
-  if (story.author_id !== req.session.userId) return res.status(403).send('Forbidden');
+
+  if (!(await Permissions.canEditChapter(req.session.userId, story))) {
+    return res.status(403).send('Forbidden');
+  }
 
   res.render('chapters/new', { title: 'New Chapter', story });
 };
 
-// Handle chapter creation — story author only
 exports.create = async (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
 
   const story = await Story.findById(req.params.storyId);
   if (!story) return res.status(404).send('Story not found');
-  if (story.author_id !== req.session.userId) return res.status(403).send('Forbidden');
+
+  if (!(await Permissions.canEditChapter(req.session.userId, story))) {
+    return res.status(403).send('Forbidden');
+  }
 
   const { title, content } = req.body;
 
@@ -41,7 +46,6 @@ exports.create = async (req, res) => {
   res.redirect(`/stories/${story.id}/chapters/${chapter.id}`);
 };
 
-// Show one chapter — anyone can read
 exports.show = async (req, res) => {
   const chapter = await Chapter.findById(req.params.id);
   if (!chapter) return res.status(404).send('Chapter not found');
@@ -51,10 +55,19 @@ exports.show = async (req, res) => {
 
   const comments = await Comment.listByChapter(chapter.id);
 
-  res.render('chapters/show', { title: chapter.title, chapter, story, comments });
+  const canEdit = await Permissions.canEditChapter(req.session.userId, story);
+  const canDelete = await Permissions.canDeleteChapter(req.session.userId, story);
+
+  res.render('chapters/show', {
+    title: chapter.title,
+    chapter,
+    story,
+    comments,
+    canEdit,
+    canDelete
+  });
 };
 
-// Show edit form — story author only
 exports.editForm = async (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
 
@@ -62,12 +75,13 @@ exports.editForm = async (req, res) => {
   if (!chapter) return res.status(404).send('Chapter not found');
 
   const story = await Story.findById(chapter.story_id);
-  if (story.author_id !== req.session.userId) return res.status(403).send('Forbidden');
+  if (!(await Permissions.canEditChapter(req.session.userId, story))) {
+    return res.status(403).send('Forbidden');
+  }
 
   res.render('chapters/edit', { title: 'Edit Chapter', chapter, story });
 };
 
-// Handle chapter update — story author only
 exports.update = async (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
 
@@ -75,7 +89,9 @@ exports.update = async (req, res) => {
   if (!chapter) return res.status(404).send('Chapter not found');
 
   const story = await Story.findById(chapter.story_id);
-  if (story.author_id !== req.session.userId) return res.status(403).send('Forbidden');
+  if (!(await Permissions.canEditChapter(req.session.userId, story))) {
+    return res.status(403).send('Forbidden');
+  }
 
   const { title, content } = req.body;
 
@@ -94,7 +110,6 @@ exports.update = async (req, res) => {
   res.redirect(`/stories/${story.id}/chapters/${req.params.id}`);
 };
 
-// Handle chapter delete — story author only
 exports.remove = async (req, res) => {
   if (!req.session.userId) return res.redirect('/login');
 
@@ -102,7 +117,9 @@ exports.remove = async (req, res) => {
   if (!chapter) return res.status(404).send('Chapter not found');
 
   const story = await Story.findById(chapter.story_id);
-  if (story.author_id !== req.session.userId) return res.status(403).send('Forbidden');
+  if (!(await Permissions.canDeleteChapter(req.session.userId, story))) {
+    return res.status(403).send('Forbidden');
+  }
 
   await Chapter.remove(req.params.id);
 

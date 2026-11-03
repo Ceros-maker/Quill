@@ -1,0 +1,45 @@
+<h1>Manage Roles — <%= story.title %></h1>
+<p class="meta">Assign editors and moderators to help run this story.</p>
+
+<div class="card">
+  <h3>Assign a Role</h3>
+  <form method="POST" action="/stories/<%= story.id %>/roles">
+    <label>Username</label>
+    <input type="text" name="username" placeholder="Who do you want to assign?" required />
+
+    <label>Role</label>
+    <select name="role" required>
+      <option value="">Choose...</option>
+      <option value="editor">Editor — can edit chapters</option>
+      <option value="moderator">Moderator — can delete comments</option>
+    </select>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Assign Role</button>
+    </div>
+  </form>
+</div>
+
+<h2>Current Assignments</h2>
+
+<% if (roles.length === 0) { %>
+  <p class="meta">No one has been assigned a role on this story yet.</p>
+<% } else { %>
+  <ul class="chapter-list">
+    <% for (const r of roles) { %>
+      <li class="chapter-item" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>
+          <strong><a href="/users/<%= r.username %>"><%= r.username %></a></strong>
+          <span class="badge-draft" style="margin-left: 8px;"><%= r.role %></span>
+        </span>
+        <form method="POST" action="/stories/<%= story.id %>/roles/<%= r.user_id %>/remove" style="margin: 0;">
+          <button type="submit" class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;">Remove</button>
+        </form>
+      </li>
+    <% } %>
+  </ul>
+<% } %>
+
+<div class="form-actions" style="margin-top: 32px;">
+  <a href="/stories/<%= story.id %>" class="btn btn-secondary">Back to Story</a>
+</div>
